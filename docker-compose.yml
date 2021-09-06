@@ -1,10 +1,10 @@
 version: "3"
 services:
-  hmpps-template-kotlin:
+  prisoner-transactions-api:
     build:
       context: .
     network_mode: "host"
-    container_name: hmpps-template-kotlin
+    container_name: prisoner-transactions-api
     ports:
       - "8081:8080"
     healthcheck:
