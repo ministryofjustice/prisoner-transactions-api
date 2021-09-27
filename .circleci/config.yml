@@ -6,10 +6,10 @@ orbs:
 parameters:
   alerts-slack-channel:
     type: string
-    default: dps_alerts_security
+    default: farsight_alerts
   releases-slack-channel:
     type: string
-    default: dps-releases
+    default: farsight_alerts
 
 jobs:
   validate:
