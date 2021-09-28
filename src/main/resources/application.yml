@@ -17,6 +17,18 @@ spring:
     group:
       test:
         - "stdout"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+#          jwk-set-uri: ${hmpps.auth.url}/.well-known/jwks.json
+          jwk-set-uri: http://localhost:8090/auth/.well-known/jwks.json
+
+  flyway:
+    locations: classpath:/migration/postgres,classpath:/migration/common
+    url: ${spring.datasource.url}
+    user: ${DB_USER}
+    password: ${DB_PASS}
 
 server:
   port: 8080
