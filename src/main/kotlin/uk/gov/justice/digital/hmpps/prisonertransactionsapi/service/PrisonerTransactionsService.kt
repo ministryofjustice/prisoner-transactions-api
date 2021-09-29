@@ -13,6 +13,6 @@ class PrisonerTransactionsService() {
   @Transactional
   fun generateMagicLink(request: PrisonerTransactionsRequest) {
     log.info("generateMagicLink called....")
-    log.info("Email id - "+ request.email)
+    log.info("Email id - " + request.email)
   }
 }
