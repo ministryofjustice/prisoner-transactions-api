@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -15,11 +17,14 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.PrisonerTransactionsRequest
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.PrisonerTransactionsService
+import javax.servlet.http.HttpServletRequest
 import javax.validation.constraints.NotEmpty
 
 @RestController
 @RequestMapping("/prisoner-transactions", produces = [MediaType.APPLICATION_JSON_VALUE])
 class PrisonerTransactionsController(private val prisonerTransactionsService: PrisonerTransactionsService) {
+
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   @PostMapping(value = ["/link/email"])
 //  @PreAuthorize("hasAnyRole('SYSTEM_USER')")
@@ -50,7 +55,9 @@ class PrisonerTransactionsController(private val prisonerTransactionsService: Pr
       )
     ]
   )
-  fun createMagicLink(@RequestBody @NotEmpty request: PrisonerTransactionsRequest) {
+  fun createMagicLink(@RequestBody @NotEmpty request: PrisonerTransactionsRequest, httpReq: HttpServletRequest) {
+    log.info("Remote IP Address ${httpReq.remoteAddr}")
+    log.info("Remote Host ${httpReq.remoteHost}")
     prisonerTransactionsService.generateMagicLink(request)
   }
 }
