@@ -31,6 +31,8 @@ generic-service:
   namespace_secrets:
     prisoner-transactions-api:
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
+#      EMAIL_ID: "arulelango.jayaraman@digital.justice.gov.uk"
+#      EMAIL_PASSWORD: "temp123"
 
   allowlist:
     office: "217.33.148.210/32"

@@ -16,7 +16,20 @@ spring:
   jpa:
     show-sql: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: prisoner.transactiions@gmail.com
+    password: fakePassword
+    properties.mail.smtp:
+      auth: true
+      starttls.enable: true
+
 # Container-provider local auth server
 hmpps:
   auth:
     url: http://localhost:8090/auth
+
+app:
+  magiclink:
+    url: "localhost:8080/sign-in?secret="
