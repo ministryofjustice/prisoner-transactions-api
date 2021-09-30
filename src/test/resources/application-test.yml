@@ -4,3 +4,14 @@ server:
 management.endpoint:
   health.cache.time-to-live: 0
   info.cache.time-to-live: 0
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: prisoner.transactiions@gmail.com
+    password: fakePassword
+    properties.mail.smtp:
+      auth: true
+      starttls.enable: true
+
