@@ -20,4 +20,3 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8090/.well-known/jwks.json
-
