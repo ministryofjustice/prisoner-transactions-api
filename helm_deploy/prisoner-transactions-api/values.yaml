@@ -31,7 +31,7 @@ generic-service:
   namespace_secrets:
     prisoner-transactions-api:
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
-      EMAIL_PASSWORD: "SPRING_MAIL_PASSWORD"
+      SPRING_MAIL_PASSWORD: "EMAIL_PASSWORD"
 
   allowlist:
     office: "217.33.148.210/32"
