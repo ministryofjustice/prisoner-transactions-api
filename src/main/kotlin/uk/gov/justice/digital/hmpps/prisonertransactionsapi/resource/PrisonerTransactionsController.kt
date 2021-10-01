@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.validation.constraints.NotEmpty
 
 @RestController
-@RequestMapping( produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class PrisonerTransactionsController(private val prisonerTransactionsService: PrisonerTransactionsService) {
 
   val log: Logger = LoggerFactory.getLogger(this::class.java)
