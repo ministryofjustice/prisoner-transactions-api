@@ -19,4 +19,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${hmpps.auth.url}/.well-known/jwks.json
+          jwk-set-uri: http://localhost:8090/.well-known/jwks.json
