@@ -15,3 +15,8 @@ spring:
       auth: true
       starttls.enable: true
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${hmpps.auth.url}/.well-known/jwks.json
