@@ -19,7 +19,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: prisoner.transactiions@gmail.com
+    username: fakeUsername
     password: fakePassword
     properties.mail.smtp:
       auth: true
