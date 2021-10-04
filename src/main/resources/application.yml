@@ -16,7 +16,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: prisoner.transactions@digital.justice.gov.uk
+    username: prisoner.transactiions@gmail.com
     password: fakePassword
     properties.mail.smtp:
       auth: true
