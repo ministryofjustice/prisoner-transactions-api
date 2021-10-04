@@ -1,9 +1,11 @@
 server:
   shutdown: immediate
 
-management.endpoint:
-  health.cache.time-to-live: 0
-  info.cache.time-to-live: 0
+management:
+  endpoint:
+    health.cache.time-to-live: 0
+    info.cache.time-to-live: 0
+  health.mail.enabled: false
 
 spring:
   mail:
