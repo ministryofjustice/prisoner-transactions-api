@@ -29,7 +29,6 @@ class ResourceServerConfiguration : WebSecurityConfigurerAdapter() {
           "/swagger-ui/**",
           "/swagger-ui.html",
           "/h2-console/**",
-          "/prisoner-transactions/link/email"
         ).permitAll().anyRequest().authenticated()
       }.oauth2ResourceServer().jwt().jwtAuthenticationConverter(AuthAwareTokenConverter())
   }
