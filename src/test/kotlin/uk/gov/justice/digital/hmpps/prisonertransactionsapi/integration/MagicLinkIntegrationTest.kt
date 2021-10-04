@@ -53,5 +53,4 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
 
     // TODO use the token as authentication to hit new API to create barcode
   }
-
 }
