@@ -28,7 +28,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
   private lateinit var tokenService: TokenService
 
   @Test
-  fun canCreateBarcodeFromMagicLink() {
+  fun `can create barcode from magic link`() {
     doNothing().whenever(spyEmailSender).sendEmail(anyString(), anyString())
 
     webTestClient.post().uri("/link/email")
@@ -59,12 +59,32 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
     val barcode = webTestClient.post().uri("/barcode/prisoner/A1234AA")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
-      .header("BARCODE_TOKEN", token)
+      .header("CREATE_BARCODE_TOKEN", token)
       .exchange()
       .expectStatus().isOk
       .expectBody(String::class.java)
       .returnResult().responseBody
 
     assertThat(barcode).isEqualTo("1234567890")
+  }
+
+  @Test
+  fun `cannot create barcode without a valid token`() {
+    webTestClient.post().uri("/barcode/prisoner/A1234AA")
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .header("CREATE_BARCODE_TOKEN", "unknown token")
+      .exchange()
+      .expectStatus().isUnauthorized
+  }
+
+  @Test
+  fun `cannot create barcode with a normal Auth token`() {
+    webTestClient.post().uri("/barcode/prisoner/A1234AA")
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .headers(setAuthorisation())
+      .exchange()
+      .expectStatus().isForbidden
   }
 }
