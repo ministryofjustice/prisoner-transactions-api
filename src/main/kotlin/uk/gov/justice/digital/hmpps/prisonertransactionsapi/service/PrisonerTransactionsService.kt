@@ -28,5 +28,10 @@ class PrisonerTransactionsService(
   fun verifyMagicLink(request: VerifyLinkRequest): String =
     secretStore[request.secret]
       ?.let { email -> tokenService.generateToken(email) }
+      ?.also { secretStore.remove(request.secret) }
       ?: throw EntityNotFoundException("Not found")
+
+  fun createBarcode(prisoner: String) = "1234567890"
+
+  fun checkSecret(secret: String) = secretStore.containsKey(secret)
 }

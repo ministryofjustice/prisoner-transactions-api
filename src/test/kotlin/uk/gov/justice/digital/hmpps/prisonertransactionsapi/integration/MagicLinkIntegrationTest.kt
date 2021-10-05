@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.PrisonerTransactionsService
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.TokenService
 
 class MagicLinkIntegrationTest : IntegrationTestBase() {
@@ -21,10 +22,13 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
   private lateinit var spyEmailSender: EmailSender
 
   @Autowired
+  private lateinit var prisonerTransactionsService: PrisonerTransactionsService
+
+  @Autowired
   private lateinit var tokenService: TokenService
 
   @Test
-  fun CanReturnTokenFromMagicLink() {
+  fun canCreateBarcodeFromMagicLink() {
     doNothing().whenever(spyEmailSender).sendEmail(anyString(), anyString())
 
     webTestClient.post().uri("/link/email")
@@ -50,7 +54,17 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .returnResult().responseBody
 
     assertThat(tokenService.getTokenEmail(token)).isEqualTo("some.email@company.com")
+    assertThat(prisonerTransactionsService.checkSecret(secret)).isFalse
 
-    // TODO use the token as authentication to hit new API to create barcode
+    val barcode = webTestClient.post().uri("/barcode/prisoner/A1234AA")
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .header("BARCODE_TOKEN", token)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(String::class.java)
+      .returnResult().responseBody
+
+    assertThat(barcode).isEqualTo("1234567890")
   }
 }
