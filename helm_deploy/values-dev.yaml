@@ -2,7 +2,7 @@
 # Per environment values which override defaults in prisoner-transactions-api/values.yaml
 
 generic-service:
-  replicaCount: 2
+  replicaCount: 1 # Using a single pod so I can use an in memory data store - can increase the pods again once the data store is externalised
 
   ingress:
     host: prisoner-transactions-api-dev.hmpps.service.justice.gov.uk
