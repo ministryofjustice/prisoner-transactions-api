@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.preauth.RequestHeaderAuth
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
-class ResourceServerConfiguration(private val magicLinkUserDetailsService: UserDetailsService) :
+class ResourceServerConfiguration(private val barcodeUserDetailsService: UserDetailsService) :
   WebSecurityConfigurerAdapter() {
 
   override fun configure(http: HttpSecurity) {
@@ -28,7 +28,7 @@ class ResourceServerConfiguration(private val magicLinkUserDetailsService: UserD
       .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
       .and().headers().frameOptions().sameOrigin()
       .and().csrf().disable()
-      .addFilterAfter(magicLinkAuthenticationFilter(), RequestHeaderAuthenticationFilter::class.java)
+      .addFilterAfter(createBarcodeAuthenticationFilter(), RequestHeaderAuthenticationFilter::class.java)
       .authorizeRequests { auth ->
         auth.antMatchers(
           "/webjars/**",
@@ -45,34 +45,30 @@ class ResourceServerConfiguration(private val magicLinkUserDetailsService: UserD
   }
 
   @Bean
-  fun magicLinkAuthenticationFilter(): RequestHeaderAuthenticationFilter {
-    return RequestHeaderAuthenticationFilter().apply {
-      setPrincipalRequestHeader("BARCODE_TOKEN")
+  fun createBarcodeAuthenticationFilter(): RequestHeaderAuthenticationFilter =
+    RequestHeaderAuthenticationFilter().apply {
+      setPrincipalRequestHeader("CREATE_BARCODE_TOKEN")
       setAuthenticationManager(authenticationManager())
       setExceptionIfHeaderMissing(false)
     }
-  }
 
   @Bean
-  override fun authenticationManager(): AuthenticationManager {
-    return ProviderManager(mutableListOf<AuthenticationProvider>(preAuthProvider()))
-  }
+  override fun authenticationManager(): AuthenticationManager =
+    ProviderManager(mutableListOf<AuthenticationProvider>(preAuthProvider()))
 
   @Bean
-  fun preAuthProvider(): PreAuthenticatedAuthenticationProvider {
-    return PreAuthenticatedAuthenticationProvider().apply {
+  fun preAuthProvider(): PreAuthenticatedAuthenticationProvider =
+    PreAuthenticatedAuthenticationProvider().apply {
       setPreAuthenticatedUserDetailsService(
         userDetailsServiceWrapper()
       )
     }
-  }
 
   @Bean
-  fun userDetailsServiceWrapper(): UserDetailsByNameServiceWrapper<PreAuthenticatedAuthenticationToken> {
-    return UserDetailsByNameServiceWrapper<PreAuthenticatedAuthenticationToken>().apply {
+  fun userDetailsServiceWrapper(): UserDetailsByNameServiceWrapper<PreAuthenticatedAuthenticationToken> =
+    UserDetailsByNameServiceWrapper<PreAuthenticatedAuthenticationToken>().apply {
       setUserDetailsService(
-        magicLinkUserDetailsService
+        barcodeUserDetailsService
       )
     }
-  }
 }

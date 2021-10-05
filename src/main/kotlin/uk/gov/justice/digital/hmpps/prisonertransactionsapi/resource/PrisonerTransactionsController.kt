@@ -87,7 +87,7 @@ class PrisonerTransactionsController(private val prisonerTransactionsService: Pr
 
   @PostMapping(value = ["/barcode/prisoner/{prisoner}"])
   @ResponseBody
-  @PreAuthorize("hasRole('ROLE_BARCODE')")
+  @PreAuthorize("hasRole('ROLE_CREATE_BARCODE')")
   @Operation(
     summary = "Creates a one time barcode for the prisoner",
   )

@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.TokenService
 
 @Component
-class MagicLinkUserDetailsService(private val tokenService: TokenService) : UserDetailsService {
-  override fun loadUserByUsername(username: String): UserDetails {
-    return tokenService.getTokenEmail(username)
-      ?.let { User(it, "n/a", mutableListOf(SimpleGrantedAuthority("ROLE_BARCODE"))) }
-      ?: throw UsernameNotFoundException("User $username not found")
-  }
+class CreateBarcodeUserDetailsService(private val tokenService: TokenService) : UserDetailsService {
+  // TODO check the expiry of the token and throw if it has expired
+  override fun loadUserByUsername(token: String): UserDetails =
+    tokenService.getTokenEmail(token)
+      ?.let { User(it, "n/a", mutableListOf(SimpleGrantedAuthority("ROLE_CREATE_BARCODE"))) }
+      ?: throw UsernameNotFoundException("User $token not found")
 }
