@@ -13,7 +13,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
-import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.PrisonerTransactionsService
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.TokenService
 
 class MagicLinkIntegrationTest : IntegrationTestBase() {
 
@@ -21,7 +21,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
   private lateinit var spyEmailSender: EmailSender
 
   @Autowired
-  private lateinit var prisonerTransactionsService: PrisonerTransactionsService
+  private lateinit var tokenService: TokenService
 
   @Test
   fun CanReturnTokenFromMagicLink() {
@@ -49,7 +49,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .expectBody(String::class.java)
       .returnResult().responseBody
 
-    assertThat(prisonerTransactionsService.getTokenEmail(token)).isEqualTo("some.email@company.com")
+    assertThat(tokenService.getTokenEmail(token)).isEqualTo("some.email@company.com")
 
     // TODO use the token as authentication to hit new API to create barcode
   }
