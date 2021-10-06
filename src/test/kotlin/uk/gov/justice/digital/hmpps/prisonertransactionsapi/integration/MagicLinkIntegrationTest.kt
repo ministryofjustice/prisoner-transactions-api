@@ -13,6 +13,8 @@ import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeResponse
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.PrisonerTransactionsService
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.TokenService
 
@@ -43,29 +45,29 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
     verify(spyEmailSender).sendEmail(eq("some.email@company.com"), secretCaptor.capture())
     val secret = secretCaptor.firstValue
 
-    val token = webTestClient.post().uri("/link/verify")
+    val verifyLinkResponse = webTestClient.post().uri("/link/verify")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
       .body(BodyInserters.fromValue("""{ "secret": "$secret" }"""))
       .exchange()
       .expectStatus().isOk
-      .expectBody(String::class.java)
+      .expectBody(VerifyLinkResponse::class.java)
       .returnResult().responseBody
 
-    assertThat(tokenService.getTokenEmail(token)).isEqualTo("some.email@company.com")
+    assertThat(tokenService.getTokenEmail(verifyLinkResponse.token)).isEqualTo("some.email@company.com")
     assertThat(prisonerTransactionsService.checkSecret(secret)).isFalse
 
-    val barcode = webTestClient.post().uri("/barcode/prisoner/A1234AA")
+    val createBarcodeResponse = webTestClient.post().uri("/barcode/prisoner/A1234AA")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
-      .header("CREATE_BARCODE_TOKEN", token)
+      .header("CREATE_BARCODE_TOKEN", verifyLinkResponse.token)
       .exchange()
       .expectStatus().isOk
-      .expectBody(String::class.java)
+      .expectBody(CreateBarcodeResponse::class.java)
       .returnResult().responseBody
 
-    assertThat(barcode).isEqualTo("1234567890")
+    assertThat(createBarcodeResponse.barcode).isEqualTo("1234567890")
   }
 
   @Test

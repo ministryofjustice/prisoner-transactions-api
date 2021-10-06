@@ -72,4 +72,4 @@ management:
 
 app:
   magiclink:
-    url: "https://prisoner-transactions-dev.hmpps.service.justice.gov.uk/?secret="
+    url: "https://prisoner-transactions-dev.hmpps.service.justice.gov.uk/link/verify-link?secret="
