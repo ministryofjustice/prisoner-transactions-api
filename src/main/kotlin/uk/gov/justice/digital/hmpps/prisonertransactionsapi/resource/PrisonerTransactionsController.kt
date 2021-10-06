@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.ErrorResponse
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.MagicLinkRequest
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkRequest
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.PrisonerTransactionsService
 import javax.servlet.http.HttpServletRequest
 import javax.validation.constraints.NotEmpty
@@ -82,8 +84,8 @@ class PrisonerTransactionsController(private val prisonerTransactionsService: Pr
       )
     ]
   )
-  fun verifyMagicLink(@RequestBody @NotEmpty request: VerifyLinkRequest, httpReq: HttpServletRequest): String =
-    prisonerTransactionsService.verifyMagicLink(request)
+  fun verifyMagicLink(@RequestBody @NotEmpty request: VerifyLinkRequest, httpReq: HttpServletRequest): VerifyLinkResponse =
+    VerifyLinkResponse(prisonerTransactionsService.verifyMagicLink(request))
 
   @PostMapping(value = ["/barcode/prisoner/{prisoner}"])
   @ResponseBody
@@ -112,6 +114,6 @@ class PrisonerTransactionsController(private val prisonerTransactionsService: Pr
       )
     ]
   )
-  fun createBarcode(@PathVariable @NotEmpty prisoner: String): String =
-    prisonerTransactionsService.createBarcode(prisoner)
+  fun createBarcode(@PathVariable @NotEmpty prisoner: String): CreateBarcodeResponse =
+    CreateBarcodeResponse(prisonerTransactionsService.createBarcode(prisoner))
 }
