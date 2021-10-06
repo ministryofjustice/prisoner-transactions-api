@@ -22,5 +22,7 @@ class TokenService {
       .also { tokenStore[it] = email }
       .also { log.info("Generated token $it for email $email") }
 
-  fun getTokenEmail(token: String) = tokenStore.get(token)
+  fun getTokenEmail(token: String) =
+    tokenStore.get(token)
+      ?.also { log.info("Found email $it for token $token") }
 }
