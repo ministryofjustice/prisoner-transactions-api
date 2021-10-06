@@ -23,13 +23,18 @@ class PrisonerTransactionsService(
   fun generateMagicLink(request: MagicLinkRequest) =
     tokenService.generateSecret()
       .also { secretStore[it] = request.email }
+      .also { log.info("Saved secret $it for email ${request.email}") }
       .also { emailSender.sendEmail(request.email, it) }
 
-  fun verifyMagicLink(request: VerifyLinkRequest): String =
-    secretStore[request.secret]
+  fun verifyMagicLink(request: VerifyLinkRequest): String {
+    log.info("Received request to verify secret ${request.secret}")
+    return secretStore[request.secret]
+      ?.also { log.info("Found the ${request.secret} linked to email $it") }
       ?.let { email -> tokenService.generateToken(email) }
       ?.also { secretStore.remove(request.secret) }
+      ?.also { log.info("Removed secret ${request.secret}") }
       ?: throw EntityNotFoundException("Not found")
+  }
 
   fun createBarcode(prisoner: String) = "1234567890"
 
