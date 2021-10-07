@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.prisonertransactionsapi.config
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -17,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
 import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter
-import javax.servlet.http.HttpServletRequest
 
 @Configuration
 @EnableWebSecurity
@@ -49,40 +46,29 @@ class ResourceServerConfiguration(private val barcodeUserDetailsService: UserDet
 
   @Bean
   fun createBarcodeAuthenticationFilter(): RequestHeaderAuthenticationFilter =
-    CreateBarcodeAuthenticationFilter(createBarcodeAuthenticationManager())
+    RequestHeaderAuthenticationFilter().apply {
+      setPrincipalRequestHeader("Create-Barcode-Token")
+      setAuthenticationManager(authenticationManager())
+      setExceptionIfHeaderMissing(false)
+    }
 
   @Bean
-  fun createBarcodeAuthenticationManager(): AuthenticationManager =
-    ProviderManager(mutableListOf<AuthenticationProvider>(createBarcodePreAuthProvider()))
+  override fun authenticationManager(): AuthenticationManager =
+    ProviderManager(mutableListOf<AuthenticationProvider>(preAuthProvider()))
 
   @Bean
-  fun createBarcodePreAuthProvider(): PreAuthenticatedAuthenticationProvider =
+  fun preAuthProvider(): PreAuthenticatedAuthenticationProvider =
     PreAuthenticatedAuthenticationProvider().apply {
       setPreAuthenticatedUserDetailsService(
-        createBarcodeUserDetailsServiceWrapper()
+        userDetailsServiceWrapper()
       )
     }
 
   @Bean
-  fun createBarcodeUserDetailsServiceWrapper(): UserDetailsByNameServiceWrapper<PreAuthenticatedAuthenticationToken> =
+  fun userDetailsServiceWrapper(): UserDetailsByNameServiceWrapper<PreAuthenticatedAuthenticationToken> =
     UserDetailsByNameServiceWrapper<PreAuthenticatedAuthenticationToken>().apply {
       setUserDetailsService(
         barcodeUserDetailsService
       )
     }
-}
-
-class CreateBarcodeAuthenticationFilter(createBarcodeAuthenticationManager: AuthenticationManager) : RequestHeaderAuthenticationFilter() {
-  val log: Logger = LoggerFactory.getLogger(this::class.java)
-
-  init {
-    setPrincipalRequestHeader("CREATE_BARCODE_TOKEN")
-    setAuthenticationManager(createBarcodeAuthenticationManager)
-    setExceptionIfHeaderMissing(false)
-  }
-
-  override fun getPreAuthenticatedPrincipal(request: HttpServletRequest): Any? {
-    log.info("For request ${request.requestURI} found CREATE_BARCODE_TOKEN request header: ${request.getHeader("CREATE_BARCODE_TOKEN")}")
-    return super.getPreAuthenticatedPrincipal(request)
-  }
 }

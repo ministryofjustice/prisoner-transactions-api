@@ -61,7 +61,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
     val createBarcodeResponse = webTestClient.post().uri("/barcode/prisoner/A1234AA")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
-      .header("CREATE_BARCODE_TOKEN", verifyLinkResponse.token)
+      .header("Create-Barcode-Token", verifyLinkResponse.token)
       .exchange()
       .expectStatus().isOk
       .expectBody(CreateBarcodeResponse::class.java)
@@ -75,7 +75,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
     webTestClient.post().uri("/barcode/prisoner/A1234AA")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
-      .header("CREATE_BARCODE_TOKEN", "unknown token")
+      .header("Create-Barcode-Token", "unknown token")
       .exchange()
       .expectStatus().isUnauthorized
   }
