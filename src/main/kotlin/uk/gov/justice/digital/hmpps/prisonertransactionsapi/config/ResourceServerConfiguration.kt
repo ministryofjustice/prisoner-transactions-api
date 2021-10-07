@@ -47,7 +47,7 @@ class ResourceServerConfiguration(private val barcodeUserDetailsService: UserDet
   @Bean
   fun createBarcodeAuthenticationFilter(): RequestHeaderAuthenticationFilter =
     RequestHeaderAuthenticationFilter().apply {
-      setPrincipalRequestHeader("CREATE_BARCODE_TOKEN")
+      setPrincipalRequestHeader("Create-Barcode-Token")
       setAuthenticationManager(authenticationManager())
       setExceptionIfHeaderMissing(false)
     }
