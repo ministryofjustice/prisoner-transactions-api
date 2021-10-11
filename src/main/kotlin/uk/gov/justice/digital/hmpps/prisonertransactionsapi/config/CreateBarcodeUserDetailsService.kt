@@ -12,7 +12,7 @@ class CreateBarcodeUserDetailsService(private val jwtService: JwtService) :
   UserDetailsService {
   override fun loadUserByUsername(token: String): UserDetails =
     token
-      ?.takeIf { jwtService.validateToken(it) }
+      .takeIf { jwtService.validateToken(it) }
       ?.let { jwtService.subject(it) }
       ?.let { User(it, "n/a", mutableListOf(SimpleGrantedAuthority("ROLE_CREATE_BARCODE"))) }
       ?: throw UsernameNotFoundException("Token $token is invalid")
