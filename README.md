@@ -62,3 +62,22 @@ that is seeded with data specific to each test suite.
 
 `$ ./gradlew dependencyCheckAnalyze`
 
+# Authorisation via Magic Link (CJSM users)
+
+For the `create barcode` user story we verify users by sending a magic link to their CJSM email account. Once the user clicks the link we issue a JWT giving the user authorisation to use the create barcode function. 
+
+## Signing the JWT
+
+In order to sign the JWT generated for Magic Link users there are private/public keys saved in configuration properties `jwt.private.key` and `jwt.public.key`. A different public/private keypair is required locally and for each deployment environment.
+
+To create a public/private keypair for an environment:
+* Create a new directory to hold the keys, we'll call this `keys`, and `cd` into the directory.
+* Run command `ssh-keygen -t rsa -m PEM`. When prompted enter filename `rsa-key` and leave the passphrase empty.
+* Run command `ls` - you should see files `rsa-key` and `rsa-key.pub`
+* To generate the public key run command `ssh-keygen -m PKCS8 -e` and when prompted enter the key `rsa-key`. This will produce a public key and print it out to screen. Copy the contents into new file `rsa-key.x509.public`.
+* To generate the private key run command `openssl pkcs8 -topk8 -inform pem -in rsa-key -outform pem -nocrypt -out rsa-key.pkcs8.private`
+* To convert the public key into a string we can use in a Kubernetes secret run command `cat rsa-key.x509.public | awk 'NR>2 {print last} {last=$0}' | tr -d '\n' | base64 | tr -d '\n'`.
+* To convert the private key into a string we can use in a Kubernetes secret run command `cat rsa-key.pkcs8.private | awk 'NR>2 {print last} {last=$0}' | tr -d '\n' | base64 | tr -d '\n'`.
+* We now need to save the keys into Kubernetes secrets for the environment. A guide for creating secrets can be found on Cloud Platforms documentation here: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/deploying-an-app/add-secrets-to-deployment.html#adding-a-secret-to-an-application
+* The public key should be saved in Kubernetes secret `prisoner-transactions-api` with key `JWT_PUBLIC_KEY`
+* The private key should be saved in Kubernetes secret `prisoner-transactions-api` with key `JWT_PRIVATE_KEY`
