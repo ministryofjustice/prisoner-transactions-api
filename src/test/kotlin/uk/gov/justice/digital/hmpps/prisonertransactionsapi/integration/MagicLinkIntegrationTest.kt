@@ -12,11 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.JwtService
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.PrisonerTransactionsService
-import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.TokenService
 
 class MagicLinkIntegrationTest : IntegrationTestBase() {
 
@@ -27,7 +27,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
   private lateinit var prisonerTransactionsService: PrisonerTransactionsService
 
   @Autowired
-  private lateinit var tokenService: TokenService
+  private lateinit var jwtService: JwtService
 
   @Test
   fun `can create barcode from magic link`() {
@@ -55,7 +55,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .expectBody(VerifyLinkResponse::class.java)
       .returnResult().responseBody
 
-    assertThat(tokenService.getTokenEmail(verifyLinkResponse.token)).isEqualTo("some.email@company.com")
+    assertThat(jwtService.subject(verifyLinkResponse.token)).isEqualTo("some.email@company.com")
     assertThat(prisonerTransactionsService.checkSecret(secret)).isFalse
 
     val createBarcodeResponse = webTestClient.post().uri("/barcode/prisoner/A1234AA")

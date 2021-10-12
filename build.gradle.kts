@@ -29,6 +29,7 @@ dependencies {
 
   implementation("com.google.code.gson:gson:2.8.8")
   implementation("io.arrow-kt:arrow-core:0.10.5")
+  implementation("io.jsonwebtoken:jjwt:0.9.1")
 
   // OpenAPI
   implementation("org.springdoc:springdoc-openapi-ui:1.5.10")
@@ -39,7 +40,6 @@ dependencies {
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("org.awaitility:awaitility-kotlin:4.1.0")
-  testImplementation("io.jsonwebtoken:jjwt:0.9.1")
   testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.28.0")
   testImplementation("io.swagger.parser.v3:swagger-parser-v2-converter:2.0.27")
   testImplementation("org.mockito:mockito-inline:3.12.4")
