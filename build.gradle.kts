@@ -1,6 +1,6 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.8"
-  kotlin("plugin.spring") version "1.5.30"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.9"
+  kotlin("plugin.spring") version "1.5.31"
 }
 
 configurations {
@@ -25,24 +25,24 @@ dependencies {
   // Database dependencies
   runtimeOnly("com.h2database:h2")
 //  runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.2.20")
+  runtimeOnly("org.postgresql:postgresql:42.2.24")
 
   implementation("com.google.code.gson:gson:2.8.8")
-  implementation("io.arrow-kt:arrow-core:0.10.5")
+  implementation("io.arrow-kt:arrow-core:1.0.0")
   implementation("io.jsonwebtoken:jjwt:0.9.1")
 
   // OpenAPI
-  implementation("org.springdoc:springdoc-openapi-ui:1.5.10")
-  implementation("org.springdoc:springdoc-openapi-data-rest:1.5.10")
-  implementation("org.springdoc:springdoc-openapi-kotlin:1.5.10")
+  implementation("org.springdoc:springdoc-openapi-ui:1.5.11")
+  implementation("org.springdoc:springdoc-openapi-data-rest:1.5.11")
+  implementation("org.springdoc:springdoc-openapi-kotlin:1.5.11")
 
   // Test dependencies
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("org.awaitility:awaitility-kotlin:4.1.0")
   testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.28.0")
-  testImplementation("io.swagger.parser.v3:swagger-parser-v2-converter:2.0.27")
-  testImplementation("org.mockito:mockito-inline:3.12.4")
+  testImplementation("io.swagger.parser.v3:swagger-parser-v2-converter:2.0.28")
+  testImplementation("org.mockito:mockito-inline:4.0.0")
   testImplementation("io.projectreactor:reactor-test")
 }
 
@@ -51,7 +51,7 @@ java {
 }
 
 tasks {
-  compileKotlin {
+  withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
       jvmTarget = "16"
     }
