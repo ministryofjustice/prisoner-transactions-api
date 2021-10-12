@@ -19,18 +19,19 @@ class PrisonerTransactionsService(
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   // TODO move the secret store to a Redis cache
-  private val secretStore = mutableMapOf<String, String>()
+  private val secretStore = mutableMapOf<String, MagicLinkRequest>()
 
   @Transactional
   fun generateMagicLink(request: MagicLinkRequest) =
     generateSecret()
-      .also { secretStore[it] = request.email }
+      .also { secretStore[it] = request }
       .also { emailSender.sendEmail(request.email, it) }
 
   fun verifyMagicLink(request: VerifyLinkRequest): String =
     secretStore[request.secret]
-      ?.let { email -> jwtService.generateToken(email) }
       ?.also { secretStore.remove(request.secret) }
+      ?.takeIf { magicLinkRequest -> magicLinkRequest.sessionID == request.sessionID }
+      ?.let { magicLinkRequest -> jwtService.generateToken(magicLinkRequest.email) }
       ?: throw EntityNotFoundException("Not found")
 
   fun createBarcode(prisoner: String) = "1234567890"

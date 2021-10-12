@@ -6,5 +6,8 @@ import javax.validation.constraints.NotNull
 data class MagicLinkRequest(
   @Schema(description = "The email address to send the magic link to", example = "andrew.barret@company.com")
   @NotNull
-  val email: String
+  val email: String,
+  @Schema(description = "The browser session ID")
+  @NotNull
+  val sessionID: String
 )

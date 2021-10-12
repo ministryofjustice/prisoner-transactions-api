@@ -37,7 +37,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
-      .body(BodyInserters.fromValue("""{ "email": "some.email@company.com" }"""))
+      .body(BodyInserters.fromValue("""{ "email": "some.email@company.com", "sessionID": "some-session" }"""))
       .exchange()
       .expectStatus().isOk
 
@@ -49,7 +49,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
-      .body(BodyInserters.fromValue("""{ "secret": "$secret" }"""))
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session" }"""))
       .exchange()
       .expectStatus().isOk
       .expectBody(VerifyLinkResponse::class.java)
@@ -68,6 +68,41 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .returnResult().responseBody
 
     assertThat(createBarcodeResponse.barcode).isEqualTo("1234567890")
+  }
+
+  @Test
+  fun `magic link is deleted if wrong session ID is sent in request`() {
+    doNothing().whenever(spyEmailSender).sendEmail(anyString(), anyString())
+
+    webTestClient.post().uri("/link/email")
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .headers(setAuthorisation())
+      .body(BodyInserters.fromValue("""{ "email": "some.email@company.com", "sessionID": "some-session" }"""))
+      .exchange()
+      .expectStatus().isOk
+
+    val secretCaptor = argumentCaptor<String>()
+    verify(spyEmailSender).sendEmail(eq("some.email@company.com"), secretCaptor.capture())
+    val secret = secretCaptor.firstValue
+
+    webTestClient.post().uri("/link/verify")
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .headers(setAuthorisation())
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "wrong-session" }"""))
+      .exchange()
+      .expectStatus().isNotFound
+
+    assertThat(prisonerTransactionsService.checkSecret(secret)).isFalse
+
+    webTestClient.post().uri("/link/verify")
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .headers(setAuthorisation())
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session" }"""))
+      .exchange()
+      .expectStatus().isNotFound
   }
 
   @Test
