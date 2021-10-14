@@ -25,6 +25,8 @@ spring:
       auth: true
       starttls.enable: true
 
+  redis.port: 6378
+
 # Container-provider local auth server
 hmpps:
   auth:
@@ -33,3 +35,7 @@ hmpps:
 app:
   magiclink:
     url: "http://localhost:3000/link/verify-link?secret="
+
+application:
+  # enable keyspace notifications when running in standalone redis (unsupported for elasticache)
+  keyspace-notifications: 'Ex'

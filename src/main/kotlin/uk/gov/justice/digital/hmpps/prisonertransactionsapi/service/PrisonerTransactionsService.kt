@@ -6,8 +6,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.JwtService
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.Secret
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.SecretRepository
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.MagicLinkRequest
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkRequest
+import java.util.Optional
 import java.util.UUID
 import javax.persistence.EntityNotFoundException
 
@@ -15,28 +18,27 @@ import javax.persistence.EntityNotFoundException
 class PrisonerTransactionsService(
   private val emailSender: EmailSender,
   private val jwtService: JwtService,
+  private val secretRepository: SecretRepository,
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  // TODO move the secret store to a Redis cache
-  private val secretStore = mutableMapOf<String, MagicLinkRequest>()
-
   @Transactional
-  fun generateMagicLink(request: MagicLinkRequest) =
-    generateSecret()
-      .also { secretStore[it] = request }
-      .also { emailSender.sendEmail(request.email, it) }
+  fun generateMagicLink(request: MagicLinkRequest) {
+    Secret(request.sessionID, request.email, generateSecret())
+      .also { secret -> secretRepository.save(secret) }
+      .also { secret -> emailSender.sendEmail(request.email, secret.secretValue) }
+  }
 
   fun verifyMagicLink(request: VerifyLinkRequest): String =
-    secretStore[request.secret]
-      ?.also { secretStore.remove(request.secret) }
-      ?.takeIf { magicLinkRequest -> magicLinkRequest.sessionID == request.sessionID }
-      ?.let { magicLinkRequest -> jwtService.generateToken(magicLinkRequest.email) }
+    secretRepository.findById(request.sessionID).toNullable()
+      ?.also { secret -> secretRepository.delete(secret) }
+      ?.takeIf { secret -> secret.sessionId == request.sessionID }
+      ?.let { secret -> jwtService.generateToken(secret.email) }
       ?: throw EntityNotFoundException("Not found")
 
   fun createBarcode(prisoner: String) = "1234567890"
 
-  fun checkSecret(secret: String) = secretStore.containsKey(secret)
-
   private fun generateSecret() = UUID.randomUUID().toString()
 }
+
+fun <T> Optional<T>.toNullable(): T? = orElse(null)
