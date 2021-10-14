@@ -24,13 +24,13 @@ class PrisonerTransactionsService(
 
   @Transactional
   fun generateMagicLink(request: MagicLinkRequest) {
-    Secret(request.sessionID, request.email, generateSecret())
+    Secret(request.email, request.sessionID, generateSecret())
       .also { secret -> secretRepository.save(secret) }
       .also { secret -> emailSender.sendEmail(request.email, secret.secretValue) }
   }
 
   fun verifyMagicLink(request: VerifyLinkRequest): String =
-    secretRepository.findById(request.sessionID).toNullable()
+    secretRepository.findById(request.email).toNullable()
       ?.also { secret -> secretRepository.delete(secret) }
       ?.takeIf { secret -> secret.sessionId == request.sessionID }
       ?.let { secret -> jwtService.generateToken(secret.email) }

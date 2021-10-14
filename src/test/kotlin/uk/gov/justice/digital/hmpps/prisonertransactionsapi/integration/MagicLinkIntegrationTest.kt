@@ -47,7 +47,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
-      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session" }"""))
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session", "email": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isOk
       .expectBody(VerifyLinkResponse::class.java)
@@ -70,7 +70,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
-      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session" }"""))
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session", "email": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isNotFound
   }
@@ -95,7 +95,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
-      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "wrong-session" }"""))
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "wrong-session", "email": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isNotFound
 
@@ -103,7 +103,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
-      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session" }"""))
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session", "email": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isNotFound
   }

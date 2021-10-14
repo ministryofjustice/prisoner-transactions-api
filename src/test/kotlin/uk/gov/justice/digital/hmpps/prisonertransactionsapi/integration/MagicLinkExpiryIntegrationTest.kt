@@ -47,7 +47,7 @@ class MagicLinkExpiryIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
-      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session" }"""))
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session", "email": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isNotFound
   }

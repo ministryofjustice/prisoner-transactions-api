@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import javax.validation.constraints.NotNull
 
 data class VerifyLinkRequest(
+  @Schema(description = "The email of the user verifying a magic link")
+  @NotNull
+  val email: String,
   @Schema(description = "The one time secret used to verify a magic link")
   @NotNull
   val secret: String,

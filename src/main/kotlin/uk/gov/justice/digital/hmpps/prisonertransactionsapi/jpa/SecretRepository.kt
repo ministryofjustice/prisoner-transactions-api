@@ -11,7 +11,7 @@ interface SecretRepository : CrudRepository<Secret, String>
 @RedisHash(value = "sessionSecrets")
 data class Secret(
   @Id
-  val sessionId: String,
   val email: String,
+  val sessionId: String,
   val secretValue: String,
 )
