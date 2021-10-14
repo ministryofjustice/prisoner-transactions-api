@@ -7,6 +7,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.anyString
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.SpyBean
@@ -16,15 +17,12 @@ import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.JwtService
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkResponse
-import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.PrisonerTransactionsService
 
+@ExtendWith(RedisExtension::class)
 class MagicLinkIntegrationTest : IntegrationTestBase() {
 
   @SpyBean
   private lateinit var spyEmailSender: EmailSender
-
-  @Autowired
-  private lateinit var prisonerTransactionsService: PrisonerTransactionsService
 
   @Autowired
   private lateinit var jwtService: JwtService
@@ -49,14 +47,13 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
-      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session" }"""))
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session", "email": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isOk
       .expectBody(VerifyLinkResponse::class.java)
       .returnResult().responseBody
 
     assertThat(jwtService.subject(verifyLinkResponse.token)).isEqualTo("some.email@company.com")
-    assertThat(prisonerTransactionsService.checkSecret(secret)).isFalse
 
     val createBarcodeResponse = webTestClient.post().uri("/barcode/prisoner/A1234AA")
       .accept(MediaType.APPLICATION_JSON)
@@ -68,6 +65,14 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .returnResult().responseBody
 
     assertThat(createBarcodeResponse.barcode).isEqualTo("1234567890")
+
+    webTestClient.post().uri("/link/verify")
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .headers(setAuthorisation())
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session", "email": "some.email@company.com" }"""))
+      .exchange()
+      .expectStatus().isNotFound
   }
 
   @Test
@@ -90,17 +95,15 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
-      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "wrong-session" }"""))
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "wrong-session", "email": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isNotFound
-
-    assertThat(prisonerTransactionsService.checkSecret(secret)).isFalse
 
     webTestClient.post().uri("/link/verify")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
-      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session" }"""))
+      .body(BodyInserters.fromValue("""{ "secret": "$secret", "sessionID": "some-session", "email": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isNotFound
   }

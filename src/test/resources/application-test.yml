@@ -6,6 +6,7 @@ management:
     health.cache.time-to-live: 0
     info.cache.time-to-live: 0
   health.mail.enabled: false
+  health.redis.enabled: false
 
 spring:
   mail:
@@ -22,5 +23,7 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8090/.well-known/jwks.json
+
+  redis.port: 6380
 
 app.magiclink.url: http://localhost:8080/link/verify?secret=

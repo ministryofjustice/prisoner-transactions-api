@@ -1,6 +1,7 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.9"
   kotlin("plugin.spring") version "1.5.31"
+  kotlin("plugin.jpa") version "1.5.31"
 }
 
 configurations {
@@ -18,6 +19,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-mail")
+  implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
   // GOVUK Notify:
   implementation("uk.gov.service.notify:notifications-java-client:3.17.2-RELEASE")
@@ -44,6 +46,7 @@ dependencies {
   testImplementation("io.swagger.parser.v3:swagger-parser-v2-converter:2.0.28")
   testImplementation("org.mockito:mockito-inline:4.0.0")
   testImplementation("io.projectreactor:reactor-test")
+  testImplementation("it.ozimov:embedded-redis:0.7.3")
 }
 
 java {
