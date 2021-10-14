@@ -34,6 +34,9 @@ generic-service:
       SPRING_MAIL_PASSWORD: "EMAIL_PASSWORD"
       JWT_PUBLIC_KEY: "JWT_PUBLIC_KEY"
       JWT_PRIVATE_KEY: "JWT_PRIVATE_KEY"
+    pta-elasticache-redis:
+      SPRING_REDIS_HOST: "primary_endpoint_address"
+      SPRING_REDIS_PASSWORD: "auth_token"
 
   allowlist:
     office: "217.33.148.210/32"
