@@ -64,7 +64,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
       .expectBody(CreateBarcodeResponse::class.java)
       .returnResult().responseBody
 
-    assertThat(createBarcodeResponse.barcode).isEqualTo("1234567890")
+    assertThat(createBarcodeResponse.barcode).isEqualTo(createBarcodeResponse.barcode)
 
     webTestClient.post().uri("/link/verify")
       .accept(MediaType.APPLICATION_JSON)
