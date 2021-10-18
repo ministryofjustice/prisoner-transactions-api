@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.ErrorResponse
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeRequest
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.MagicLinkRequest
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkRequest
@@ -91,6 +92,7 @@ class PrisonerTransactionsController(
   fun verifyMagicLink(@RequestBody @NotEmpty request: VerifyLinkRequest, httpReq: HttpServletRequest): VerifyLinkResponse =
     VerifyLinkResponse(prisonerTransactionsService.verifyMagicLink(request))
 
+  @Deprecated(message = "Replaced by a POST to /barcode")
   @PostMapping(value = ["/barcode/prisoner/{prisoner}"])
   @ResponseBody
   @PreAuthorize("hasRole('ROLE_CREATE_BARCODE')")
@@ -118,6 +120,36 @@ class PrisonerTransactionsController(
       )
     ]
   )
-  fun createBarcode(@PathVariable @NotEmpty prisoner: String): CreateBarcodeResponse =
+  fun createBarcodeOld(@PathVariable @NotEmpty prisoner: String): CreateBarcodeResponse =
     CreateBarcodeResponse(barcodeService.createBarcode("PLACEHOLDER_USER", prisoner))
+
+  @PostMapping(value = ["/barcode"])
+  @ResponseBody
+  @PreAuthorize("hasRole('ROLE_CREATE_BARCODE')")
+  @Operation(
+    summary = "Creates a one time barcode for the prisoner",
+  )
+  @ApiResponses(
+    value = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Barcode created",
+        content = [
+          Content(mediaType = "application/json")
+        ],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorised, requires a valid magic link token",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      )
+    ]
+  )
+  fun createBarcode(@RequestBody @NotEmpty request: CreateBarcodeRequest): CreateBarcodeResponse =
+    CreateBarcodeResponse(barcodeService.createBarcode(request.userId, request.prisonerId))
 }
