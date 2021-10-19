@@ -9,24 +9,28 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.ErrorResponse
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeRequest
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.MagicLinkRequest
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkRequest
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkResponse
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.BarcodeService
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.PrisonerTransactionsService
 import javax.servlet.http.HttpServletRequest
 import javax.validation.constraints.NotEmpty
 
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-class PrisonerTransactionsController(private val prisonerTransactionsService: PrisonerTransactionsService) {
+class PrisonerTransactionsController(
+  private val prisonerTransactionsService: PrisonerTransactionsService,
+  private val barcodeService: BarcodeService,
+) {
 
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -87,7 +91,7 @@ class PrisonerTransactionsController(private val prisonerTransactionsService: Pr
   fun verifyMagicLink(@RequestBody @NotEmpty request: VerifyLinkRequest, httpReq: HttpServletRequest): VerifyLinkResponse =
     VerifyLinkResponse(prisonerTransactionsService.verifyMagicLink(request))
 
-  @PostMapping(value = ["/barcode/prisoner/{prisoner}"])
+  @PostMapping(value = ["/barcode"])
   @ResponseBody
   @PreAuthorize("hasRole('ROLE_CREATE_BARCODE')")
   @Operation(
@@ -114,6 +118,6 @@ class PrisonerTransactionsController(private val prisonerTransactionsService: Pr
       )
     ]
   )
-  fun createBarcode(@PathVariable @NotEmpty prisoner: String): CreateBarcodeResponse =
-    CreateBarcodeResponse(prisonerTransactionsService.createBarcode(prisoner))
+  fun createBarcode(@RequestBody @NotEmpty request: CreateBarcodeRequest): CreateBarcodeResponse =
+    CreateBarcodeResponse(barcodeService.createBarcode(request.userId, request.prisonerId))
 }

@@ -36,8 +36,6 @@ class PrisonerTransactionsService(
       ?.let { secret -> jwtService.generateToken(secret.email) }
       ?: throw EntityNotFoundException("Not found")
 
-  fun createBarcode(prisoner: String) = "1234567890"
-
   private fun generateSecret() = UUID.randomUUID().toString()
 }
 

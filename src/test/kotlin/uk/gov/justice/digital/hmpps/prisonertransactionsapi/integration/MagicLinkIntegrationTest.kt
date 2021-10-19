@@ -7,22 +7,15 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.anyString
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.JwtService
-import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkResponse
 
-@ExtendWith(RedisExtension::class)
 class MagicLinkIntegrationTest : IntegrationTestBase() {
-
-  @SpyBean
-  private lateinit var spyEmailSender: EmailSender
 
   @Autowired
   private lateinit var jwtService: JwtService
@@ -55,16 +48,17 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
 
     assertThat(jwtService.subject(verifyLinkResponse.token)).isEqualTo("some.email@company.com")
 
-    val createBarcodeResponse = webTestClient.post().uri("/barcode/prisoner/A1234AA")
+    val createBarcodeResponse = webTestClient.post().uri("/barcode")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .header("Create-Barcode-Token", verifyLinkResponse.token)
+      .body(BodyInserters.fromValue("""{ "prisonerId": "A1234AA", "sessionID": "some-session", "userId": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isOk
       .expectBody(CreateBarcodeResponse::class.java)
       .returnResult().responseBody
 
-    assertThat(createBarcodeResponse.barcode).isEqualTo("1234567890")
+    assertThat(createBarcodeResponse.barcode).isEqualTo(createBarcodeResponse.barcode)
 
     webTestClient.post().uri("/link/verify")
       .accept(MediaType.APPLICATION_JSON)
@@ -110,7 +104,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `cannot create barcode without a valid token`() {
-    webTestClient.post().uri("/barcode/prisoner/A1234AA")
+    webTestClient.post().uri("/barcode")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .header("Create-Barcode-Token", "unknown token")
@@ -120,10 +114,11 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `cannot create barcode with a normal Auth token`() {
-    webTestClient.post().uri("/barcode/prisoner/A1234AA")
+    webTestClient.post().uri("/barcode")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
+      .body(BodyInserters.fromValue("""{ "prisonerId": "A1234AA", "sessionID": "some-session", "userId": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isForbidden
   }
