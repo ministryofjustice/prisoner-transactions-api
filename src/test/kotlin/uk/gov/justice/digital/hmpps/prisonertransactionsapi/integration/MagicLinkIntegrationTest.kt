@@ -48,10 +48,11 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
 
     assertThat(jwtService.subject(verifyLinkResponse.token)).isEqualTo("some.email@company.com")
 
-    val createBarcodeResponse = webTestClient.post().uri("/barcode/prisoner/A1234AA")
+    val createBarcodeResponse = webTestClient.post().uri("/barcode")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .header("Create-Barcode-Token", verifyLinkResponse.token)
+      .body(BodyInserters.fromValue("""{ "prisonerId": "A1234AA", "sessionID": "some-session", "userId": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isOk
       .expectBody(CreateBarcodeResponse::class.java)
@@ -103,7 +104,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `cannot create barcode without a valid token`() {
-    webTestClient.post().uri("/barcode/prisoner/A1234AA")
+    webTestClient.post().uri("/barcode")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .header("Create-Barcode-Token", "unknown token")
@@ -113,10 +114,11 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `cannot create barcode with a normal Auth token`() {
-    webTestClient.post().uri("/barcode/prisoner/A1234AA")
+    webTestClient.post().uri("/barcode")
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
+      .body(BodyInserters.fromValue("""{ "prisonerId": "A1234AA", "sessionID": "some-session", "userId": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isForbidden
   }
