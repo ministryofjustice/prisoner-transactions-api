@@ -8,11 +8,9 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.anyString
-import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.BodyInserters
-import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
 
 @ExtendWith(RedisExtension::class)
 @TestPropertySource(
@@ -21,9 +19,6 @@ import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
   ]
 )
 class MagicLinkExpiryIntegrationTest : IntegrationTestBase() {
-
-  @SpyBean
-  private lateinit var spyEmailSender: EmailSender
 
   @Test
   fun `magic link is invalid if it has expired`() {

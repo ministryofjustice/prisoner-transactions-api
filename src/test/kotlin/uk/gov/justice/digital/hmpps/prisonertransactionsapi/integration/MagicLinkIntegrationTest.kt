@@ -7,22 +7,15 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.anyString
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.JwtService
-import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkResponse
 
-@ExtendWith(RedisExtension::class)
 class MagicLinkIntegrationTest : IntegrationTestBase() {
-
-  @SpyBean
-  private lateinit var spyEmailSender: EmailSender
 
   @Autowired
   private lateinit var jwtService: JwtService

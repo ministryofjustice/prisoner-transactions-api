@@ -4,22 +4,17 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.SpyBean
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.Barcode
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeEvent
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeEventRepository
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeRepository
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeStatus
-import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.BarcodeGeneratorService
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.BarcodeService
 
 class BarcodeServiceTest : IntegrationTestBase() {
 
   @Autowired
   private lateinit var barcodeService: BarcodeService
-
-  @SpyBean
-  private lateinit var barcodeGeneratorService: BarcodeGeneratorService
 
   @Autowired
   private lateinit var barcodeRepository: BarcodeRepository

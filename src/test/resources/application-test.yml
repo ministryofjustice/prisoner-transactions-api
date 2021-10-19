@@ -34,7 +34,7 @@ spring:
   flyway:
     locations: classpath:/migration/h2,classpath:/migration/common
     url: ${spring.datasource.url}
-    user: prisoner_transactions
+    user: prisoner-transactions
     password: dummy
 
   h2:
