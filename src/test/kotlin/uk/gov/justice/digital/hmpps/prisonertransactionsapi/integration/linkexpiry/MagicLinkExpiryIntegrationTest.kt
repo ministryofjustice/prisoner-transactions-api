@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.prisonertransactionsapi.integration
+package uk.gov.justice.digital.hmpps.prisonertransactionsapi.integration.linkexpiry
 
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.doNothing
@@ -10,6 +10,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.BodyInserters
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.integration.IntegrationTestBase
 
 @TestPropertySource(
   properties = [
