@@ -9,7 +9,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -91,37 +90,6 @@ class PrisonerTransactionsController(
   )
   fun verifyMagicLink(@RequestBody @NotEmpty request: VerifyLinkRequest, httpReq: HttpServletRequest): VerifyLinkResponse =
     VerifyLinkResponse(prisonerTransactionsService.verifyMagicLink(request))
-
-  @Deprecated(message = "Replaced by a POST to /barcode")
-  @PostMapping(value = ["/barcode/prisoner/{prisoner}"])
-  @ResponseBody
-  @PreAuthorize("hasRole('ROLE_CREATE_BARCODE')")
-  @Operation(
-    summary = "Creates a one time barcode for the prisoner",
-  )
-  @ApiResponses(
-    value = [
-      ApiResponse(
-        responseCode = "200",
-        description = "Barcode created",
-        content = [
-          Content(mediaType = "application/json")
-        ],
-      ),
-      ApiResponse(
-        responseCode = "401",
-        description = "Unauthorised, requires a valid magic link token",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-      ApiResponse(
-        responseCode = "404",
-        description = "Not found",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      )
-    ]
-  )
-  fun createBarcodeOld(@PathVariable @NotEmpty prisoner: String): CreateBarcodeResponse =
-    CreateBarcodeResponse(barcodeService.createBarcode("PLACEHOLDER_USER", prisoner))
 
   @PostMapping(value = ["/barcode"])
   @ResponseBody
