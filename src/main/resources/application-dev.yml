@@ -18,6 +18,12 @@ spring:
     username: prisoner-transactions
     password: dummy
 
+  flyway:
+    locations: classpath:/migration/h2,classpath:/migration/common
+    url: ${spring.datasource.url}
+    user: create_vary
+    password: dummy
+
   jpa:
     show-sql: true
 

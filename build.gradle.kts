@@ -12,25 +12,19 @@ dependencies {
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
   // Spring boot dependencies
-  implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-mail")
   implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
-  // GOVUK Notify:
-  implementation("uk.gov.service.notify:notifications-java-client:3.17.2-RELEASE")
-
   // Database dependencies
   runtimeOnly("com.h2database:h2")
-//  runtimeOnly("org.flywaydb:flyway-core")
+  runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql:42.2.24")
 
   implementation("com.google.code.gson:gson:2.8.8")
-  implementation("io.arrow-kt:arrow-core:1.0.0")
   implementation("io.jsonwebtoken:jjwt:0.9.1")
 
   // OpenAPI
