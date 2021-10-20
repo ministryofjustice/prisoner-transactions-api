@@ -22,7 +22,7 @@ class BarcodeService(
           barcode = it,
           userId = userId,
           prisonerId = prisonerId,
-          prison = "PLACEHOLDER_PRISON",
+          prison = "LEI",
         )
       )
     }.barcode
