@@ -49,8 +49,7 @@ Unit tests mock all external dependencies and can be run with no dependent conta
 
 # Running the integration tests
 
-Integration tests use Wiremock to stub any API calls required, and use a local H2 database 
-that is seeded with data specific to each test suite.
+Integration tests use Wiremock to stub any API calls required, and use a local postgres database which is started automatically. To start manually use command `docker-compose up prisoner-transactions-api-db` .
 
 `$ ./gradlew integrationTest`
 
