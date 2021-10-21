@@ -20,7 +20,6 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
   // Database dependencies
-  runtimeOnly("com.h2database:h2")
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql:42.2.24")
 
@@ -41,6 +40,7 @@ dependencies {
   testImplementation("org.mockito:mockito-inline:4.0.0")
   testImplementation("io.projectreactor:reactor-test")
   testImplementation("it.ozimov:embedded-redis:0.7.3")
+  testImplementation("org.testcontainers:postgresql:1.15.3")
 }
 
 java {

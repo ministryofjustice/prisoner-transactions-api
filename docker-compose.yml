@@ -23,6 +23,19 @@ services:
       - '6378:6378'
     command: --port 6378
 
+  prisoner-transactions-api-db:
+    image: postgres:13.2
+    networks:
+      - hmpps
+    container_name: prisoner-transactions-api-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=admin_password
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=prisoner_transactions_api_db
+
 
 networks:
   hmpps:

@@ -27,7 +27,7 @@ data class BarcodeEvent(
   val id: Long = -1,
   @NotNull
   @ManyToOne
-  @JoinColumn(name = "BARCODE")
+  @JoinColumn(name = "barcode")
   val barcode: Barcode,
   @NotNull
   val userId: String,

@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.prisonertransactionsapi.service
 
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.Barcode
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeEvent
@@ -25,16 +24,14 @@ class BarcodeService(
           prison = "LEI",
         )
       )
-    }.barcode
+    }.code
 
   private fun createBarcode(): Barcode {
-    var barcode: Barcode? = null
-    while (barcode == null) {
-      barcode = try {
-        barcodeRepository.save(Barcode(barcode = barcodeGeneratorService.generateBarcode()))
-      } catch (ex: DataIntegrityViolationException) { null } catch (ex: Exception) { throw ex }
+    var barcode = barcodeGeneratorService.generateBarcode()
+    while (barcodeRepository.existsById(barcode)) {
+      barcode = barcodeGeneratorService.generateBarcode()
     }
-    return barcode
+    return barcodeRepository.save(Barcode(barcode))
   }
 }
 
