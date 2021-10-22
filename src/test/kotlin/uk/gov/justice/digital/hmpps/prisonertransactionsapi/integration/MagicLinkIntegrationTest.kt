@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.JwtService
-import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkResponse
 
 class MagicLinkIntegrationTest : IntegrationTestBase() {
@@ -48,17 +47,15 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
 
     assertThat(jwtService.subject(verifyLinkResponse.token)).isEqualTo("some.email@company.com")
 
-    val createBarcodeResponse = webTestClient.post().uri("/barcode")
-      .accept(MediaType.APPLICATION_JSON)
+    webTestClient.post().uri("/barcode")
+      .accept(MediaType.IMAGE_PNG)
       .contentType(MediaType.APPLICATION_JSON)
       .header("Create-Barcode-Token", verifyLinkResponse.token)
       .body(BodyInserters.fromValue("""{ "prisonerId": "A1234AA", "sessionID": "some-session", "userId": "some.email@company.com" }"""))
       .exchange()
       .expectStatus().isOk
-      .expectBody(CreateBarcodeResponse::class.java)
+      .expectBody(ByteArray::class.java)
       .returnResult().responseBody
-
-    assertThat(createBarcodeResponse.barcode).isEqualTo(createBarcodeResponse.barcode)
 
     webTestClient.post().uri("/link/verify")
       .accept(MediaType.APPLICATION_JSON)
@@ -105,7 +102,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
   @Test
   fun `cannot create barcode without a valid token`() {
     webTestClient.post().uri("/barcode")
-      .accept(MediaType.APPLICATION_JSON)
+      .accept(MediaType.IMAGE_PNG)
       .contentType(MediaType.APPLICATION_JSON)
       .header("Create-Barcode-Token", "unknown token")
       .exchange()
@@ -115,7 +112,7 @@ class MagicLinkIntegrationTest : IntegrationTestBase() {
   @Test
   fun `cannot create barcode with a normal Auth token`() {
     webTestClient.post().uri("/barcode")
-      .accept(MediaType.APPLICATION_JSON)
+      .accept(MediaType.IMAGE_PNG)
       .contentType(MediaType.APPLICATION_JSON)
       .headers(setAuthorisation())
       .body(BodyInserters.fromValue("""{ "prisonerId": "A1234AA", "sessionID": "some-session", "userId": "some.email@company.com" }"""))
