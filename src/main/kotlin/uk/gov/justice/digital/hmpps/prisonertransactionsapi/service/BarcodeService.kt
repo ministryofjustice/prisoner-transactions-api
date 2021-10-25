@@ -5,7 +5,7 @@ import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.Barcode
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeEvent
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeEventRepository
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeRepository
-import kotlin.random.Random
+import java.awt.image.BufferedImage
 
 @Service
 class BarcodeService(
@@ -33,11 +33,6 @@ class BarcodeService(
     }
     return barcodeRepository.save(Barcode(barcode))
   }
-}
 
-@Service
-class BarcodeGeneratorService {
-  private val maxBarcode = 999_999_999_999
-
-  fun generateBarcode(): String = Random.nextLong(maxBarcode).toString()
+  fun generateBarcodeImage(barcode: String): BufferedImage = barcodeGeneratorService.generateBarcodeImage(barcode)
 }

@@ -25,6 +25,10 @@ dependencies {
 
   implementation("com.google.code.gson:gson:2.8.8")
   implementation("io.jsonwebtoken:jjwt:0.9.1")
+  implementation("com.google.zxing:core:3.3.0")
+  implementation("com.google.zxing:javase:3.3.0")
+  implementation("net.sourceforge.barbecue:barbecue:1.5-beta1")
+  implementation("net.sf.barcode4j:barcode4j:2.1")
 
   // OpenAPI
   implementation("org.springdoc:springdoc-openapi-ui:1.5.11")

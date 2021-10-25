@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeRequest
-import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.CreateBarcodeResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.MagicLinkRequest
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkRequest
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.model.VerifyLinkResponse
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.BarcodeService
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.PrisonerTransactionsService
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
+import javax.imageio.ImageIO
 import javax.servlet.http.HttpServletRequest
 import javax.validation.constraints.NotEmpty
 
@@ -88,10 +90,17 @@ class PrisonerTransactionsController(
       )
     ]
   )
-  fun verifyMagicLink(@RequestBody @NotEmpty request: VerifyLinkRequest, httpReq: HttpServletRequest): VerifyLinkResponse =
+  fun verifyMagicLink(
+    @RequestBody @NotEmpty request: VerifyLinkRequest,
+    httpReq: HttpServletRequest
+  ): VerifyLinkResponse =
     VerifyLinkResponse(prisonerTransactionsService.verifyMagicLink(request))
 
-  @PostMapping(value = ["/barcode"])
+  @PostMapping(
+    value = ["/barcode"],
+    consumes = [MediaType.APPLICATION_JSON_VALUE],
+    produces = [MediaType.IMAGE_PNG_VALUE]
+  )
   @ResponseBody
   @PreAuthorize("hasRole('ROLE_CREATE_BARCODE')")
   @Operation(
@@ -118,6 +127,14 @@ class PrisonerTransactionsController(
       )
     ]
   )
-  fun createBarcode(@RequestBody @NotEmpty request: CreateBarcodeRequest): CreateBarcodeResponse =
-    CreateBarcodeResponse(barcodeService.createBarcode(request.userId, request.prisonerId))
+  fun createBarcode(@RequestBody @NotEmpty request: CreateBarcodeRequest): ByteArray =
+    barcodeService.createBarcode(request.userId, request.prisonerId)
+      .let { barcodeString -> barcodeService.generateBarcodeImage(barcodeString) }
+      .toPngByteArray()
+
+  private fun BufferedImage.toPngByteArray() =
+    ByteArrayOutputStream()
+      .also { outputStream -> ImageIO.write(this, "png", outputStream) }
+      .apply { flush() }
+      .toByteArray()
 }
