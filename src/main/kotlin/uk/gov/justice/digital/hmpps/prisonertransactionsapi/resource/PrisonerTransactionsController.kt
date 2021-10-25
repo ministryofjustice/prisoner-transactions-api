@@ -9,6 +9,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -127,7 +128,7 @@ class PrisonerTransactionsController(
       )
     ]
   )
-  fun createBarcode(@RequestBody @NotEmpty request: CreateBarcodeRequest): ByteArray =
+  fun verifyBarcode(@RequestBody @NotEmpty request: CreateBarcodeRequest): ByteArray =
     barcodeService.createBarcode(request.userId, request.prisonerId)
       .let { barcodeString -> barcodeService.generateBarcodeImage(barcodeString) }
       .toPngByteArray()
@@ -137,4 +138,30 @@ class PrisonerTransactionsController(
       .also { outputStream -> ImageIO.write(this, "png", outputStream) }
       .apply { flush() }
       .toByteArray()
+
+  @PostMapping(
+    value = ["/barcode/{barcode}"]
+  )
+  @ResponseBody
+  // @PreAuthorize("hasRole('ROLE_CHECK_BARCODE')")
+  @Operation(
+    summary = "Checks a barcode is valid",
+  )
+  @ApiResponses(
+    value = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Barcode OK",
+        content = [
+          Content(mediaType = "application/json")
+        ],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Barcode Not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      )
+    ]
+  )
+  fun verifyBarcode(@PathVariable barcode: String) = barcodeService.verifyBarcode(barcode)
 }

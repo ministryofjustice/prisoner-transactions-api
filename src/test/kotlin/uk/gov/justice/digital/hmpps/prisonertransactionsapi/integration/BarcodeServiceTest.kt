@@ -2,17 +2,15 @@ package uk.gov.justice.digital.hmpps.prisonertransactionsapi.integration
 
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.Barcode
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeEvent
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeStatus
-import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.BarcodeService
+import javax.persistence.EntityNotFoundException
 
 class BarcodeServiceTest : IntegrationTestBase() {
-
-  @Autowired
-  private lateinit var barcodeService: BarcodeService
 
   @Test
   fun `can create and retrieve a barcode with the service`() {
@@ -40,5 +38,33 @@ class BarcodeServiceTest : IntegrationTestBase() {
     assertThat(barcode).isEqualTo("ANOTHER_CODE")
     assertThat(savedBarcode.code).isEqualTo("ANOTHER_CODE")
     assertThat(savedBarcodeEvents).extracting<String> { it.barcode.code }.containsExactly("ANOTHER_CODE")
+  }
+
+  @Test
+  fun `can create and scan a barcode with the service`() {
+    val barcode = barcodeService.createBarcode(userId = "some.user@domain.com", prisonerId = "a-prisoner")
+
+    try {
+      barcodeService.verifyBarcode(barcode)
+    } catch (ex: Exception) {
+      fail("The barcode should have been verified as ok", ex)
+    }
+  }
+
+  @Test
+  fun `will fail if scanning an unknown barcode`() {
+    assertThatThrownBy { barcodeService.verifyBarcode("UNKNOWN_CODE") }
+      .isInstanceOf(EntityNotFoundException::class.java)
+  }
+
+  @Test
+  fun `cannot generate new barcode for previous scan failure`() {
+    assertThatThrownBy { barcodeService.verifyBarcode("UNKNOWN_CODE") }
+      .isInstanceOf(EntityNotFoundException::class.java)
+
+    whenever(barcodeGeneratorService.generateBarcode()).thenReturn("UNKNOWN_CODE").thenReturn("ANOTHER_CODE")
+
+    val barcode = barcodeService.createBarcode(userId = "some.user@domain.com", prisonerId = "a-prisoner")
+    assertThat(barcode).isEqualTo("ANOTHER_CODE")
   }
 }

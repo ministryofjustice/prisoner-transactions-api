@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -16,6 +18,7 @@ import javax.validation.constraints.NotNull
 @Repository
 interface BarcodeEventRepository : JpaRepository<BarcodeEvent, Long> {
   fun findByBarcode(barcode: Barcode): List<BarcodeEvent>
+  fun findByBarcodeAndStatus(barcode: Barcode, status: BarcodeStatus): List<BarcodeEvent>
 }
 
 @Entity
@@ -36,6 +39,7 @@ data class BarcodeEvent(
   @NotNull
   val prisonerId: String,
   @NotNull
+  @Enumerated(EnumType.STRING)
   val status: BarcodeStatus = BarcodeStatus.CREATED,
   @NotNull
   val dateTime: LocalDateTime = LocalDateTime.now(),

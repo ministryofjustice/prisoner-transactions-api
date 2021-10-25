@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.prisonertransactionsapi.email.EmailSender
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeEventRepository
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.jpa.BarcodeRepository
 import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.BarcodeGeneratorService
+import uk.gov.justice.digital.hmpps.prisonertransactionsapi.service.BarcodeService
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
@@ -45,6 +46,9 @@ abstract class IntegrationTestBase {
 
   @Autowired
   protected lateinit var barcodeEventRepository: BarcodeEventRepository
+
+  @Autowired
+  protected lateinit var barcodeService: BarcodeService
 
   @AfterEach
   fun `clear database`() {
